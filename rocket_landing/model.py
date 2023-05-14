@@ -19,6 +19,8 @@ def d2x_dt2(
     mass_planet: float, r_rocket: float, mass_rocket: float, thrust: float
 ) -> float:
     """Rocket acceleration due to gravity and thrust."""
+    assert r_rocket > 0.
+    assert mass_rocket > 0.
     grav_const = 6.6743e-11
     return -grav_const * mass_planet / r_rocket**2 + thrust / mass_rocket
 
