@@ -22,4 +22,4 @@ jobs:
     - name: Test with pytest
       run: |
         $CONDA/bin/activate sims
-        pytest
+        $CONDA/bin/pytest
