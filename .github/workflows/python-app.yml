@@ -19,8 +19,7 @@ jobs:
     - name: Install dependencies
       run: |
         conda env update --file environment.yml --name sims
-        conda init bash
-        conda activate sims
     - name: Test with pytest
       run: |
+        $CONDA/bin/conda activate sims
         pytest
