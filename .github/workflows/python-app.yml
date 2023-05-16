@@ -21,5 +21,4 @@ jobs:
         conda env update --file environment.yml --name sims
     - name: Test with pytest
       run: |
-        $CONDA/bin/activate sims
-        $CONDA/bin/pytest
+        $CONDA/envs/sims/bin/pytest
