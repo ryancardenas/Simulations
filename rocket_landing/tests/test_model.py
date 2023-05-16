@@ -10,6 +10,7 @@ Unit tests for model.py.
 """
 
 import pytest
+
 import numpy as np
 
 import simulations.rocket_landing.model as model
@@ -93,7 +94,7 @@ class Test_d2x_dt2:
         self, mass_planet, r_rocket, mass_rocket, thrust
     ):
         with pytest.raises(AssertionError) as e:
-            result = model.d2x_dt2(
+            model.d2x_dt2(
                 mass_planet=mass_planet,
                 r_rocket=r_rocket,
                 mass_rocket=mass_rocket,
@@ -109,7 +110,7 @@ class Test_d2x_dt2:
         self, mass_planet, r_rocket, mass_rocket, thrust
     ):
         with pytest.raises(AssertionError) as e:
-            result = model.d2x_dt2(
+            model.d2x_dt2(
                 mass_planet=mass_planet,
                 r_rocket=r_rocket,
                 mass_rocket=mass_rocket,
