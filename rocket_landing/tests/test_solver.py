@@ -16,6 +16,88 @@ import numpy as np
 import simulations.rocket_landing.solver as solver
 
 
+class Test_create_v_vector:
+    """Tests that create_v_vector() meets the following expectations:
+    - Result length increases monotonically with total potential energy.
+    - Result length increases monotonically  with alpha.
+    - Result length decreases monotonically  with mass_rocket.
+    - Result length decreases monotonically with dv.
+    - Elements are equally spaced by dv.
+    """
+
+    @pytest.mark.parametrize("tpe", [np.linspace(2e4, 1e7, 6)])
+    @pytest.mark.parametrize("mass_rocket", np.linspace(1.8e2, 6.2e7, 5))
+    @pytest.mark.parametrize("alpha", np.linspace(2.4e-2, 3.4e3, 3))
+    @pytest.mark.parametrize("dv", [0.1, 1.0, 10.0, 100.0])
+    def test_result_length_increases_monotonically_with_total_potential_energy(
+        self, tpe, mass_rocket, alpha, dv
+    ):
+        vals = np.full(shape=tpe.shape[0], fill_value=np.nan, dtype=float)
+        for i in range(vals.shape[0]):
+            result = solver.create_v_vector(
+                total_potential_energy=tpe[i],
+                mass_rocket=mass_rocket,
+                alpha=alpha,
+                dv=dv,
+            )
+            vals[i] = result.shape[0]
+        assert np.all(vals[1:] >= vals[:-1])
+
+    @pytest.mark.parametrize("tpe", np.linspace(2e4, 1e7, 6))
+    @pytest.mark.parametrize("mass_rocket", np.linspace(1.8e2, 6.2e7, 5))
+    @pytest.mark.parametrize("alpha", [np.linspace(2.4e-2, 3.4e3, 3)])
+    @pytest.mark.parametrize("dv", [0.1, 1.0, 10.0, 100.0])
+    def test_result_length_increases_monotonically_with_alpha(
+        self, tpe, mass_rocket, alpha, dv
+    ):
+        vals = np.full(shape=alpha.shape[0], fill_value=np.nan, dtype=float)
+        for i in range(vals.shape[0]):
+            result = solver.create_v_vector(
+                total_potential_energy=tpe,
+                mass_rocket=mass_rocket,
+                alpha=alpha[i],
+                dv=dv,
+            )
+            vals[i] = result.shape[0]
+        assert np.all(vals[1:] >= vals[:-1])
+
+    @pytest.mark.parametrize("tpe", np.linspace(2e4, 1e7, 6))
+    @pytest.mark.parametrize("mass_rocket", [np.linspace(1.8e2, 6.2e7, 5)])
+    @pytest.mark.parametrize("alpha", np.linspace(2.4e-2, 3.4e3, 3))
+    @pytest.mark.parametrize("dv", [0.1, 1.0, 10.0, 100.0])
+    def test_result_length_decreases_monotonically_with_mass_rocket(
+        self, tpe, mass_rocket, alpha, dv
+    ):
+        vals = np.full(shape=mass_rocket.shape[0], fill_value=np.nan, dtype=float)
+        for i in range(vals.shape[0]):
+            result = solver.create_v_vector(
+                total_potential_energy=tpe,
+                mass_rocket=mass_rocket[i],
+                alpha=alpha,
+                dv=dv,
+            )
+            vals[i] = result.shape[0]
+        assert np.all(vals[1:] <= vals[:-1])
+
+    @pytest.mark.parametrize("tpe", np.linspace(2e4, 1e7, 6))
+    @pytest.mark.parametrize("mass_rocket", np.linspace(1.8e2, 6.2e7, 5))
+    @pytest.mark.parametrize("alpha", np.linspace(2.4e-2, 3.4e3, 3))
+    @pytest.mark.parametrize("dv", [np.linspace(0.1, 100.0, 5)])
+    def test_result_length_decreases_monotonically_with_dv(
+        self, tpe, mass_rocket, alpha, dv
+    ):
+        vals = np.full(shape=dv.shape[0], fill_value=np.nan, dtype=float)
+        for i in range(vals.shape[0]):
+            result = solver.create_v_vector(
+                total_potential_energy=tpe,
+                mass_rocket=mass_rocket,
+                alpha=alpha,
+                dv=dv[i],
+            )
+            vals[i] = result.shape[0]
+        assert np.all(vals[1:] <= vals[:-1])
+
+
 @pytest.mark.parametrize("r_planet, r0", [(1e6, 2.3e6), (3.2e8, 6.1e8), (5.0e7, 3e8)])
 @pytest.mark.parametrize("dr", np.arange(1e3, 1e6, 1e5))
 class Test_create_r_vector:

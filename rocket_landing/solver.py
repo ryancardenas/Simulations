@@ -19,18 +19,16 @@ from simulations.rocket_landing.model import d2x_dt2, integrate
 
 
 @numba.njit
-def create_v_vector(mass_rocket: float, mass_planet: float, r0: float, r_planet: float):
-    a_rocket = d2x_dt2(
-        mass_planet=mass_planet,
-        r_rocket=r0,
-        mass_rocket=mass_rocket,
-        thrust=0.0,
-    )
-    """Creates the velocity dimension of our state space. We probably don't need more kinetic energy than approximately
-     2x initial mechanical potential energy, which gives us an upper limit on speed."""
-    approx_potential_energy = abs(2 * mass_rocket * a_rocket * (r0 - r_planet))
-    max_speed = np.sqrt(2 * approx_potential_energy / mass_rocket).round()
-    return np.arange(-max_speed, max_speed, 1)
+def create_v_vector(
+    total_potential_energy: float,
+    mass_rocket: float,
+    alpha: float = 2.0,
+    dv: float = 1.0,
+) -> np.ndarray:
+    """Creates the velocity dimension of our state space. Velocity is bounded by total potential energy, which may
+    include the energy stored in the rocket fuel."""
+    max_speed = np.round(np.sqrt(alpha * total_potential_energy / mass_rocket))
+    return np.arange(-max_speed, max_speed, dv)
 
 
 @numba.njit
@@ -40,7 +38,7 @@ def create_r_vector(r_planet: float, r0: float, dr: float = 10.0) -> np.ndarray:
 
 
 @numba.njit
-def get_index(x_vector: np.ndarray, x: Union[float, int]):
+def get_index(x_vector: np.ndarray, x: Union[float, int]) -> int:
     """Retrieves the index of an element in an evenly spaced, sorted ascending vector."""
     assert x >= x_vector[0]
     assert x_vector.shape[0] > 1
@@ -61,7 +59,7 @@ def populate_state_map(
     mass_planet: float,
     mass_rocket: float,
     dt: float,
-):
+) -> None:
     """Computes the map from present states/actions to future states. Because this map is time-invariant, it can be
     cached and used as a lookup table to improve compute time."""
     for i in range(r_vector.shape[0]):
